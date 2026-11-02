@@ -16,5 +16,5 @@ async function walk(directory) {
 await walk(root);await mkdir('outputs',{recursive:true});
 const archive=zipSync(entries,{level:6});const target='outputs/Robb-Tracker-Shareable-Source.zip';await writeFile(target,archive);
 const verified=unzipSync(archive);
-for(const file of ['README.md','package-lock.json','worker/access.mjs','drizzle/meta/_journal.json','src/data/expo.web.ts','public/sql-wasm-browser.wasm'])if(!verified['ftracker-shareable/'+file])throw new Error('Source archive missing '+file);
+for(const file of ['README.md','package-lock.json','.github/workflows/pages.yml','scripts/build-pages.mjs','src/data/expo.web.ts','public/sql-wasm-browser.wasm'])if(!verified['ftracker-shareable/'+file])throw new Error('Source archive missing '+file);
 console.log(JSON.stringify({archive:target,files:Object.keys(verified).length,bytes:archive.length}));

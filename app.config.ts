@@ -53,7 +53,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     './plugins/with-robb-launch.cjs',
   ],
   web: { bundler: 'metro', output: 'single', favicon: './assets/icon.png', name: 'Robb Tracker', shortName: 'Robb Tracker', themeColor: '#007DFE', backgroundColor: '#F4F8FF' },
-  experiments: { typedRoutes: false },
+  experiments: { typedRoutes: false, ...(process.env.EXPO_BASE_URL ? { baseUrl: process.env.EXPO_BASE_URL.replace(/\/+$/, '') } : {}) },
   extra: {
     build: {
       commit: process.env.FTRACKER_BUILD_COMMIT || process.env.GITHUB_SHA || 'local',

@@ -14,6 +14,7 @@ import '../src/ui/web.css';
 import { InstallScreen, PwaStatus } from '../src/ui/PwaStatus';
 import { assertDate } from '../src/core/dates';
 import { shouldOfferWelcomeTour } from '../src/core/firstUse';
+import { webPath } from '../src/platform/webPaths';
 
 // Keep the configured R visible until the first app layout and local icon font are ready.
 void SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -48,7 +49,7 @@ function Navigation({ assetsReady }: { assetsReady: boolean }) {
   const { colors, dark } = useTheme();
   return <View style={{ flex: 1 }} onLayout={() => setLaidOut(true)}>
     <StatusBar style={dark ? 'light' : 'dark'} />
-    {!snapshot.profile ? (window.location.pathname === '/install' ? <InstallScreen /> : <OnboardingScreen />) : <Stack screenOptions={{
+    {!snapshot.profile ? (window.location.pathname.replace(/\/+$/, '') === webPath('install') ? <InstallScreen /> : <OnboardingScreen />) : <Stack screenOptions={{
       headerStyle: { backgroundColor: colors.background }, headerTintColor: colors.text,
       headerShadowVisible: false, headerBackButtonDisplayMode:'minimal', contentStyle: { backgroundColor: colors.background }, animation: 'slide_from_right',
     }}>

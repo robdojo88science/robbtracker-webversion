@@ -3,6 +3,7 @@ import { planNotifications } from './notificationSchedule';
 import { planDailySummaries } from './dailySummary';
 import { previewSound } from './feedback.web';
 import { getBrowserValue, setBrowserValue, withBrowserLock } from './browserStore';
+import { webPath } from './webPaths';
 
 export const WEB_NOTIFICATION_NOTE = 'Alerts can appear while this app stays open. Browsers cannot reliably schedule offline alerts after you close it; background tabs may delay delivery.';
 export interface NotificationSyncResult { scheduled: number; truncated: boolean; permissionGranted: boolean; summaries?: number }
@@ -32,15 +33,15 @@ function rebuild(): void {
   for (const item of plan.notifications) {
     const reminder = definitions.get(item.reminderId);
     const identifier = item.identifier + ':' + sound + ':' + (reminder?.updatedAt ?? '');
-    planned.set(identifier, { identifier, at: item.date.getTime(), title: 'Robb Tracker reminder', body: reminder?.title ?? 'You have a reminder.', url: '/reminders', sound, kind: 'reminder' });
+    planned.set(identifier, { identifier, at: item.date.getTime(), title: 'Robb Tracker reminder', body: reminder?.title ?? 'You have a reminder.', url: webPath('reminders'), sound, kind: 'reminder' });
   }
-  for (const item of summaries) planned.set(item.identifier, { identifier: item.identifier, at: item.date.getTime(), title: item.title, body: item.body, url: '/transactions?period=custom&start=' + item.day + '&end=' + item.day, sound, kind: 'summary' });
+  for (const item of summaries) planned.set(item.identifier, { identifier: item.identifier, at: item.date.getTime(), title: item.title, body: item.body, url: webPath('transactions?period=custom&start=' + item.day + '&end=' + item.day), sound, kind: 'summary' });
 }
 
 async function display(alert: PendingAlert): Promise<void> {
   const options: NotificationOptions = { body: alert.body, tag: alert.identifier, silent: alert.sound === 'none', data: { url: alert.url } };
   if ('serviceWorker' in navigator) {
-    const registration = await navigator.serviceWorker.getRegistration();
+    const registration = await navigator.serviceWorker.getRegistration(webPath());
     if (registration?.showNotification) {
       await registration.showNotification(alert.title, options);
       if (alert.sound !== 'none') void previewSound(alert.sound);
@@ -120,7 +121,7 @@ export function reconcileNotifications(reminders: Reminder[], enabled: boolean, 
 export async function sendTestNotification(sound: string): Promise<void> {
   if (!(await requestNotificationPermission())) throw new Error('Enable browser notifications for this site. Some browsers require installing the app first.');
   const identifier = 'ftracker:test:' + Date.now();
-  planned.set(identifier, { identifier, at: Date.now() + 5000, title: 'Robb Tracker', body: 'Browser reminders work while this app stays open.', url: '/reminders', sound, kind: 'test' });
+  planned.set(identifier, { identifier, at: Date.now() + 5000, title: 'Robb Tracker', body: 'Browser reminders work while this app stays open.', url: webPath('reminders'), sound, kind: 'test' });
   ensureListeners(); arm();
 }
 
@@ -129,7 +130,7 @@ export function cancelAll(): Promise<void> {
     latest = undefined; planned.clear(); truncated = false;
     if (timer) clearTimeout(timer); timer = undefined;
     if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-      const registration = await navigator.serviceWorker.getRegistration();
+      const registration = await navigator.serviceWorker.getRegistration(webPath());
       if (registration?.getNotifications) {
         const notifications = await registration.getNotifications();
         for (const notification of notifications) if (notification.tag.startsWith('ftracker:')) notification.close();

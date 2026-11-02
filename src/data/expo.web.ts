@@ -4,6 +4,7 @@ import { getBrowserValue, setBrowserValues, withBrowserLock } from '../platform/
 import { createBrowserDatabase } from './browserDatabase';
 import { createRepository } from './repository';
 import { migrate } from './migrations';
+import { webPath } from '../platform/webPaths';
 
 const DATA = 'finance.sqlite.v1', REVISION = 'finance.revision.v1', DEVICE = 'finance.device-id.v1';
 let sqlPromise: Promise<SqlJsStatic> | undefined;
@@ -13,10 +14,10 @@ function loadSqlJs(): Promise<SqlJsStatic> {
     const global = window as unknown as { initSqlJs?: (options: { locateFile: (file: string) => string }) => Promise<SqlJsStatic> };
     const initialize = () => {
       if (!global.initSqlJs) { reject(new Error('The offline database engine could not start.')); return; }
-      global.initSqlJs({ locateFile: file => '/' + file }).then(resolve, reject);
+      global.initSqlJs({ locateFile: file => webPath(file) }).then(resolve, reject);
     };
     if (global.initSqlJs) { initialize(); return; }
-    const script = document.createElement('script'); script.src = '/sql-wasm-browser.js'; script.async = true;
+    const script = document.createElement('script'); script.src = webPath('sql-wasm-browser.js'); script.async = true;
     script.onload = initialize;
     script.onerror = () => { script.remove(); reject(new Error('The offline database engine is not cached yet. Open the tracker online once, then try again.')); };
     document.head.appendChild(script);
