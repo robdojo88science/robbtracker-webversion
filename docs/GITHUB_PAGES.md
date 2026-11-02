@@ -4,9 +4,9 @@ The selected version has **no shared access PIN** and needs no Cloudflare accoun
 
 Repository: https://github.com/robdojo88science/robbtracker-webversion
 
-Expected app address: https://robdojo88science.github.io/robbtracker-webversion/
+Published app address: https://robdojo88science.github.io/robbtracker-webversion/
 
-**Publication is pending until GitHub Pages confirms a successful deployment.** An expected address alone is not proof that the app is live.
+**Published and verified.** [The publishing run succeeded](https://github.com/robdojo88science/robbtracker-webversion/actions/runs/41407406007). Anonymous HTTP checks confirmed the app shell, manifest, service worker, all 70 offline files and the deep-link app shell. The full test suite passed 178 tests. Physical iPhone/iPad installation and airplane-mode acceptance remain device checks.
 
 ## Owner setup
 

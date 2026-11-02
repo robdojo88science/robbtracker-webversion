@@ -6,9 +6,9 @@ Each person creates their own tracker and **personal 4-digit action PIN**. That 
 
 ## Open and install
 
-**Publication is being prepared.** The expected address is https://robdojo88science.github.io/robbtracker-webversion/ . It is not a verified live link until GitHub Pages reports a successful deployment.
+**Published app:** https://robdojo88science.github.io/robbtracker-webversion/ . GitHub Pages deployment succeeded; the app link and all 70 offline files were verified without authentication.
 
-Once published:
+To install:
 
 1. Open the app link in **Safari** while connected to the internet.
 2. Tap **Share -> Add to Home Screen**. Enable **Open as Web App** if shown, then tap Add.
