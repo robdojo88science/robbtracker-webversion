@@ -1,0 +1,13 @@
+import { build } from 'esbuild';
+import { readFileSync, writeFileSync, mkdirSync, existsSync, copyFileSync } from 'node:fs';
+import { join, extname } from 'node:path';
+const root = process.cwd();
+const manifest = JSON.parse(readFileSync('dist/offline-manifest.json', 'utf8'));
+const types = { '.html':'text/html; charset=utf-8', '.js':'text/javascript; charset=utf-8', '.css':'text/css; charset=utf-8', '.json':'application/json', '.webmanifest':'application/manifest+json', '.wasm':'application/wasm', '.png':'image/png', '.ttf':'font/ttf', '.wav':'audio/wav', '.ico':'image/x-icon', '.svg':'image/svg+xml' };
+const urls = [...new Set([...manifest.files, '/sw.js', '/offline-manifest.json'])];
+const assets = Object.fromEntries(urls.map(url => [url, { type: types[extname(url)] || 'application/octet-stream', data: readFileSync(join(root, 'dist', url)).toString('base64') }]));
+writeFileSync('worker/assets.generated.mjs', 'export default ' + JSON.stringify(assets) + ';\n');
+mkdirSync('dist/server', { recursive: true }); mkdirSync('dist/.openai', { recursive: true });
+copyFileSync('.openai/hosting.json', 'dist/.openai/hosting.json');
+await build({ entryPoints:['worker/index.mjs'], bundle:true, format:'esm', platform:'browser', target:'es2022', outfile:'dist/server/index.js', minify:true });
+console.log('Built access-PIN Worker with offline app assets.');

@@ -1,0 +1,58 @@
+name: Build Robb Tracker iPhone
+run-name: Robb Tracker · ${{ github.ref_name }} · build ${{ github.run_number }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      free_only_confirmed:
+        description: 'I verified paid Actions usage is blocked and free compute/artifact allowance remains'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ftracker-personal-ios
+  cancel-in-progress: true
+
+jobs:
+  unsigned-ipa:
+    # This opt-in is not a billing API check. Read docs/FREE_INSTALL.md first.
+    # Nothing runs on push, on a schedule, or without both explicit opt-ins.
+    if: ${{ github.event.repository.private && inputs.free_only_confirmed && vars.FTRACKER_FREE_BUILDS_ENABLED == 'true' }}
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      FTRACKER_BUILD_MODE: release
+      EXPO_NO_TELEMETRY: '1'
+      CI: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Identify the source being built
+        id: identity
+        run: node scripts/prepare-ios-build.mjs
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Verify financial and platform logic
+        run: npm run check
+      - name: Compile unsigned native device IPA
+        run: npm run build:ios:unsigned
+      - name: Verify installer identity and size
+        id: verify
+        run: node scripts/verify-ios-build.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.identity.outputs.artifact_name }}
+          path: |
+            ${{ steps.verify.outputs.ipa_path }}
+            build/ios-build-manifest.json
+          if-no-files-found: error
+          retention-days: 1
+          compression-level: 0

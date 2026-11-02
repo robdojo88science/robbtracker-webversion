@@ -1,0 +1,10 @@
+{
+  "cli": { "version": ">= 16.0.0", "appVersionSource": "remote" },
+  "build": {
+    "development": { "developmentClient": true, "distribution": "internal", "env": { "FTRACKER_BUILD_MODE": "development" }, "ios": { "simulator": false } },
+    "simulator": { "developmentClient": true, "distribution": "internal", "env": { "FTRACKER_BUILD_MODE": "development" }, "ios": { "simulator": true } },
+    "preview": { "distribution": "internal", "env": { "FTRACKER_BUILD_MODE": "release" }, "ios": { "simulator": false } },
+    "production": { "autoIncrement": true, "distribution": "store", "env": { "FTRACKER_BUILD_MODE": "release" }, "ios": { "simulator": false } }
+  },
+  "submit": { "production": {} }
+}

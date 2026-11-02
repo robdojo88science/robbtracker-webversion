@@ -1,0 +1,9 @@
+{
+  "name": "robb-ai",
+  "version": "1.0.0",
+  "description": "Private on-device intent extraction for Robb Tracker",
+  "private": true,
+  "main": "index.ts",
+  "license": "UNLICENSED",
+  "author": "Robb Tracker"
+}
